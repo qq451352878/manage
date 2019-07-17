@@ -1,5 +1,5 @@
 <template>
-  <v-form v-model="valid" ref="za`                  11`1``````````z">
+  <v-form v-model="valid" ref="brandForm">
     <v-text-field
       label="品牌名称"
       v-model="brand.name"
@@ -79,22 +79,23 @@
     },
     methods: {
       submit() {
-        // 表单校验
-        if (this.$refs.brandForm.validate()) {
-          this.brand.categories = this.brand.categories.map(c => c.id);
-          this.brand.letter = this.brand.letter.toUpperCase();
-          // 将数据提交到后台
-          this.$http({
-            method: this.isEdit ? 'put' : 'post',
-            url: '/item/brand',
-            data: this.$qs.stringify(this.brand)
-          }).then(() => {
-            // 关闭窗口
-            this.$message.success("保存成功！");
-            this.closeWindow();
-          }).catch(() => {
-            this.$message.error("保存失败！");
-          });
+        // 1、表单校验
+        if (this.$refs.myBrandForm.validate()) {
+          // 2、定义一个请求参数对象，通过解构表达式来获取brand中的属性
+          const {categories ,letter ,...params} = this.brand;
+          // 3、数据库中只要保存分类的id即可，因此我们对categories的值进行处理,只保留id，并转为字符串
+          params.cids = categories.map(c => c.id).join(",");
+          // 4、将字母都处理为大写
+          params.letter = letter.toUpperCase();
+          // 5、将数据提交到后台
+          this.$http.post('/item/brand', params)
+            .then(() => {
+              // 6、弹出提示
+              this.$message.success("保存成功！");
+            })
+            .catch(() => {
+              this.$message.error("保存失败！");
+            });
         }
       },
       clear() {
