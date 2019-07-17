@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "axios": "^0.18.1",
+    "calendar.vue": "0.0.1",
     "echarts": "^4.1.0",
     "element-ui": "^2.3.2",
     "iview": "^2.11.0",

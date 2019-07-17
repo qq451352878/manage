@@ -1,8 +1,13 @@
 <template>
   <v-card>
     <v-card-title>
-      <v-btn @click="addBrand" color="primary">新增品牌</v-btn>
-      <v-spacer/>
+      <v-toolbar dense dark color="primary">
+        <v-toolbar-title>新增品牌</v-toolbar-title>
+        <v-spacer/>
+        <!--关闭窗口的按钮-->
+        <v-btn icon @click="closeWindow"><v-icon>close</v-icon></v-btn>
+      </v-toolbar>
+
       <v-text-field
         append-icon="search"
         label="搜索"
@@ -66,6 +71,7 @@
     </v-dialog>
   </v-card>
 
+
 </template>
 
 <script>
@@ -120,9 +126,13 @@
     },
     methods: {
       addBrand() {
-        this.brand = {};
-        this.isEdit = false;
+
         this.show = true;
+
+      },
+      closeWindow(){
+        // 关闭窗口
+        this.show = false;
       },
       editBrand(item) {
         this.brand = item;
