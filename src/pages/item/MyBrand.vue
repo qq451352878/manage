@@ -18,9 +18,9 @@
           <!--关闭窗口的按钮-->
           <v-btn icon @click="closeWindow"><v-icon>close</v-icon></v-btn>
         </v-toolbar>
-        <v-card-text class="px-5">
+        <v-card-text class="px-5" >
           <!--我是表单-->
-          <MyBrandForm ></MyBrandForm >
+          <my-brand-form @reload="reload" v-bind:isEdit="isEdit" v-bind:oldBrand="oldBrand"  />
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -41,7 +41,7 @@
         <td class="text-xs-center"><img :src="props.item.image"></td>
         <td class="text-xs-center">{{ props.item.letter }}</td>
         <td class="justify-center layout">
-          <v-btn color="info">编辑</v-btn>
+          <v-btn color="info"   @click="editBrand(props.item)" @close="closeWindow">编辑</v-btn>
           <v-btn color="warning">删除</v-btn>
         </td>
       </template>
@@ -69,6 +69,8 @@
           {text: '首字母', align: 'center', value: 'letter', sortable: true,},
           {text: '操作', align: 'center', value: 'id', sortable: false}
         ],
+        oldBrand:{}//回显要修改的数据
+        ,
         show:false
       }
     },
@@ -119,6 +121,25 @@
       closeWindow() {
 
         this.show = false;
+      },
+      editBrand(oldBrand){
+        //根据品牌信息查询商品分类
+        this.$http.get("/item/category/bid/"+oldBrand.id).then(
+          ({data}) => {
+            this.isEdit=true;
+            //显示弹窗
+            this.show=true;
+            //获取要编辑的brand
+            this.oldBrand=oldBrand;
+            this.oldBrand.categories = data;
+          }
+        ).catch();
+
+      },
+
+
+      created(){
+        console.log(this.$qs);
       }
     }
   }

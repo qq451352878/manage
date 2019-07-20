@@ -1,5 +1,5 @@
 <template>
-  <v-form v-model="valid" ref="brandForm">
+  <v-form v-model="valid" ref="myBrandForm">
     <v-text-field
       label="品牌名称"
       v-model="brand.name"
@@ -27,10 +27,9 @@
       <v-flex>
         <v-upload
           v-model="brand.image"
-          url="/upload"
+          url="/upload/image"
           :multiple="false"
-          :pic-width="250"
-          :pic-height="90"
+          :pic-width="250" :pic-height="90"
         />
       </v-flex>
     </v-layout>
@@ -69,14 +68,19 @@
         imageDialogVisible:false
       }
     },
-    watch: {
+    watch:{
       oldBrand:{
         deep:true,
         handler(val){
-          Object.deepCopy(val,this.brand);
+          if(val){
+            this.brand=Object.deepCopy(val);
+          }else{
+            this.clear();
+          }
         }
       }
     },
+
     methods: {
       submit() {
         // 1、表单校验
@@ -88,10 +92,12 @@
           // 4、将字母都处理为大写
           params.letter = letter.toUpperCase();
           // 5、将数据提交到后台
-          this.$http.post('/item/brand', params)
+          this.$http.post('/item/brand/addBrand', this.$qs.stringify(params))
             .then(() => {
               // 6、弹出提示
+              this.emit('reload');
               this.$message.success("保存成功！");
+              this.clear();
             })
             .catch(() => {
               this.$message.error("保存失败！");
@@ -100,8 +106,12 @@
       },
       clear() {
         // 重置表单
+        this.brand.name='',
+        this.brand.letter='',
+        this.brand.image='',
         this.$refs.brandForm.reset();
         this.categories = [];
+        this.$refs.image_url.data.dialog
       },
       // 图片上传出成功后操作
       handleImageSuccess(res) {
@@ -111,7 +121,10 @@
         this.brand.image = "";
       },
       closeWindow(){
-        this.$emit("close");
+        // 关闭窗口
+        this.show = false;
+        // 重新加载数据
+        this.getDataFromServer();
       }
     }
   }
